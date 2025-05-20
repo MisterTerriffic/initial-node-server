@@ -3,6 +3,11 @@ const express = require("express");
 //allow the app to use the express package
 const app = express();
 
+const mongoose = require("moongoose");
+
+require("dotenv").config();
+require("./config/connection");
+require("./config/authStrategy");
 //-----Middleware-------
 //cors
 const cors = require("cors");
@@ -37,6 +42,7 @@ app.use(express.urlencoded({extended: true}));
 //Define the routing variable for authorsRoutes
 const booksRoutes = require('./routes/booksRouter');
 const authorsRoutes = require('./routes/authorsRouter');
+const authRoutes = require("./routes/authRouter");
 
 //---Per 3 CW: Dynamic Pass Data----
 //Insert Site Data
@@ -94,9 +100,32 @@ app.get("/site-routes", (request, response, next) =>{
     });
 });
 
-//Tell the app to use the routing variables you defined earlier, booksRoutes and authorsRoutes
+//Tell the app to use he routing variables you defined earlier, booksRoutes and authorsRoutes
 app.use("/api/books", booksRoutes);
 app.use("/api/authors", authorsRoutes);
+app.use("./api/auth", authRoutes);
+
+
+app.use(error, request, response, next) => {
+    let condition = error.code === 11000
+    console.log(condition);
+
+    if( condition){
+
+        return response.status(error.status || 400).json({
+            error: {message: {"Error detected!"}},
+            statusCode: error.status || 400
+        })
+        console.log(error);
+    }else {
+        console.log("We passed the handle error Middleware. Proceed.")
+    }
+
+    response.status(error.status || 500 ).json({
+        error: {message:error.message || "Internal Server Error"},
+        statusCode: error.status || 500,
+    })
+}
 
 //have the app listen at the PORT where a console.log says `Server is listening on ${PORT}. Connection established.`
 app.listen(PORT, () => {

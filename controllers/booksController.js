@@ -37,7 +37,7 @@ const getBook = async (request, response, next) => {
 };
 
 const createBook = async (request, response, next) => {
-  const {title, author, price, starRating, synopsis } = request.body; 
+    const {title, author, price, starRating, synopsis,} = request.body;
   
   const newBook = {
     title,
