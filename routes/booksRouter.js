@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { getAllBooks, getBook, createBook, updateBook, deleteBook } = require("../controllers/booksController");
+const { getAllBooks, getBook, createBook, updateBook, deleteBook, bookSample } = require("../controllers/booksController");
 
 // app.get("/books/create", (request, response, next) =>{
 //     response.status(200).json({
@@ -29,5 +29,7 @@ router.post("/create/new", createBook);
 router.put("/update/:_id", updateBook);
 
 router.delete("/delete/:_id", deleteBook);
+
+router.get("/sample", bookSample);
 
 module.exports = router;

@@ -1,12 +1,46 @@
 const siteData = require('../data/siteData')
 const bookInventory = require('../data/bookInventory');
 
+const Book = require("../models/bookModel");
+
+const bookSample = async (request, response, next) => {
+
+  const sampleModel = new Book({
+    title: "Flying Through Front End Frontiers",
+    author: "Mario Muskrat",
+    price: 12,
+    starRating: 4.7,
+    synopsis: "Have you ever wanted to create a plane with CSS? Curious about more advanced JavaScript? Look no further!",
+  });
+  
+  //the sampleModel matches the bookSchema in the Model folder
+  console.log(sampleModel, "Sample");
+  sampleModel.save(); //save the data 
+
+  try {
+    if (response.ok) { //remember if we get a 200 response = OK
+      await response.status(200).json({
+        success: { message: "This route points to the Books sample" },
+        data: sampleModel,
+      });
+    }
+  } catch (error) {
+    response.status(400).json({
+      error: { message: "Resource not found. Search again." },
+    });
+  }
+};
+
 const getAllBooks = async (request, response, next) => {
   //create a simpler iterator that stores the bookInventory
   const books = bookInventory;
 
   //Use a try-catch statement to test routing. Return the response.
   try {
+
+    const books = await Book.find({});
+    const sort = await Book.find({}).sort({title: 1});
+
     return response.status(200).json({
       success: { message: "This route points to the Books page with all of the books" },
       data: {books}, siteData
@@ -105,4 +139,4 @@ const deleteBook = async (request, response, next) => {
     });
   }
 };
-module.exports = { getAllBooks, getBook,createBook, updateBook, deleteBook };
+module.exports = { getAllBooks, getBook,createBook, updateBook, deleteBook, bookSample };
