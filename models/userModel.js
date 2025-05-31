@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-const { schema } = require("./bookModel");
 
 const { Schema } = mongoose;
 
-const userSchema = new schema({
+const userSchema = new Schema({
     firstName: {
         type: String,
         required: true,

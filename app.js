@@ -4,25 +4,20 @@ require("./config/authStrategy");
 
 //initialize express environment
 const express = require("express");
-
+//morgan
+const morgan = require("morgan");
+//4.3 P2 add the path module
+const path = require("node:path");
 const helmet = require("helmet"); 
 //allow the app to use the express package
 //-----Middleware-------
 //cors
 const cors = require("cors");
 
-//morgan
-const morgan = require("morgan");
+const session = require("express-session"); 
+const passport = require("passport");
 
 const mongoose = require("mongoose");
-
-//4.3 P2 add the path module
-const path = require("node:path");
-
-//Define the routing variable for authorsRoutes
-const booksRoutes = require('./routes/booksRouter');
-const authorsRoutes = require('./routes/authorsRouter');
-const authRoutes = require("./routes/authRouter");
 
 const app = express();
 
@@ -30,6 +25,11 @@ const app = express();
 // const PORT = 3000;
 // Yusuf: Assign a port from the .env file (This is needed for deployment later because some deployment tools we will use will create their own port and will get it from their .env file)
 const PORT = process.env.PORT || 8080; 
+
+//Define the routing variable for authorsRoutes
+const booksRoutes = require('./routes/booksRouter');
+const authorsRoutes = require('./routes/authorsRouter');
+const authRoutes = require("./routes/authRouter");
 
 app.use(helmet());
 app.use(cors({credentials: true, origin: true}));
@@ -109,14 +109,35 @@ app.use("/api/books", booksRoutes);
 app.use("/api/authors", authorsRoutes);
 app.use("./auth", authRoutes);
 
+app.use(session({
+ resave: false,
+ saveUninitialized: false,
+ secret: process.env.SECRET_KEY,
 
-app.use((error, request, response, next) => {
-    let condition = error.code === 11000;
-    console.log(condition);
+}))
+
+
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false, 
+    secret: process.env.SECRET_KEY,
+
+    cookie: {
+      httpOnly: true, 
+      secure: false,
+      maxAge: 1000 * 60 * 60 * 24, 
+    },
+  })
+);
+
+app.use(passport.initialize());
+// passport.session below will take care of creating a session on calls that require passport authentication
+app.use(passport.session());
 
     if(condition){
         return response.status(error.status || 400).json({
-            error: {message: "Error detected!"},
+            error: {message: "User already exist."},
             statusCode: error.status || 400
         })
         // console.log(error);
@@ -125,19 +146,21 @@ app.use((error, request, response, next) => {
     };
 
     response.status(error.status || 500 ).json({
-        error: {message:error.message || "Internal Server Error"},
+        error: {message: error.message || "Internal Server Error"},
         statusCode: error.status || 500,
     });
 });
 
-app.get("/", (request, response, next) => {
-    // response.send("This is the home page");//render a str on the page
-    // response.json("Hello World, This is a JSON");
-    response.status(200).json({
-        success: {message: ""},
-        statusCode: 200
-    });
-});
+
+
+// app.get("/", (request, response, next) => {
+//     // response.send("This is the home page");//render a str on the page
+//     // response.json("Hello World, This is a JSON");
+//     response.status(200).json({
+//         success: {message: ""},
+//         statusCode: 200
+//     });
+// });
 
 //have the app listen at the PORT where a console.log says `Server is listening on ${PORT}. Connection established.`
 app.listen(PORT, () => {
