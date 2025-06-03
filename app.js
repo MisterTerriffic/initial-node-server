@@ -149,7 +149,7 @@ app.use(passport.session());
         error: {message: error.message || "Internal Server Error"},
         statusCode: error.status || 500,
     });
-});
+
 
 
 
