@@ -3,11 +3,12 @@ const passport = require("passport");
 
 // const userRoster = require("../data/userInventory");
 const User = require("../models/userModel");
+const { response } = require("express");
 
 
 const register = async (request, response, next) => {
   //firstName lastName username password - request.body
-  const { firstName, lastName, username, password } = request.body;
+  const { firstName, lastName, username, password, googleId, githubId } = request.body;
   console.log(request.body);
 
   if (error) {
@@ -51,11 +52,7 @@ const register = async (request, response, next) => {
       statuscode: 201,
     });
   } catch (error) {
-    console.log(error);
-
-    response.status(400).json({
-      error: { message: "User information not entered properly." },
-    });
+      return next(error);
   }
 };
 
@@ -68,26 +65,75 @@ const login = (request, response, next) => {
 };
 
 const localLogin = async (response, request, next) => {
-  const user = userRoster[userRoster.length - 1];
+  // const user = userRoster[userRoster.length - 1];
+  passport.authenticate("local", (error, user, info) => {
+    if(error){
+      return next(error);
+    };
+        if (error) {
+      return next(error);
+    }
 
-  // const userCopy = user;
-  let result = true;
+    if(!user){
+      return response.status(401).json({
+        error: { message: "There is not user detected. Try again."},
+      });
+    }
+
+    request.login(user, (error) => {
+      if(error){
+        return next(error)
+      }
 
   const userCopy = { ...request.user._doc };
   userCopy.password = undefined;
-  function mockPassport(error, user) {
-    if (error) {
-      return next(error);
-    }
-  }
+  console.log(userCopy);
+    })
 
-  mockPassport();
-
-  response.status(200).json({
-    success: { message: "Login Successful" },
-    data: { user, userCopy },
+    response.status(200).json({
+      success: { message: "Login Successful with local authentication. "},
+       data: { user, userCopy },
     result,
+    })
   });
+  // const userCopy = user;
+  // let result = true;
+
+  // const userCopy = { ...request.user._doc };
+  // userCopy.password = undefined;
+  // function mockPassport(error, user) {
+  //   if (error) {
+  //     return next(error);
+  //   }
+
+  //   if(!user){
+  //     return response.status(401).json({
+  //       error: { message: "There is not user detected. Try again."},
+  //     });
+  //   }
+
+  //   request.login(user, (error) => {
+  //     if(error){
+  //       return next(error)
+  //     }
+
+  // const userCopy = { ...request.user._doc };
+  // userCopy.password = undefined;
+  // console.log(userCopy);
+  //   })
+
+  //   response.status(200).json({
+  //     success: { message: "Login Successful with local authentication. "}
+  //   })
+  // };
+
+  // mockPassport();
+
+  // response.status(200).json({
+  //   success: { message: "Login Successful" },
+  //   data: { user, userCopy },
+  //   result,
+  // });
 };
 
 const logout = async (request, response, next) => {
