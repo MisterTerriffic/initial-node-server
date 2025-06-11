@@ -1,4 +1,4 @@
-const bcrypt = require("bcrpyt"); 
+const bcrypt = require("bcrypt"); 
 const passport = require("passport");
 
 // const userRoster = require("../data/userInventory");

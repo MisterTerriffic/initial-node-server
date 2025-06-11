@@ -63,19 +63,19 @@ passport.use(
   )
 );
 
-passport.use(
-  new GithubStrategy(
-    {
-      clientID: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/auth/github",
-    },
-    (accessToken, refreshToken, profile, done) => {
-      console.log(profile);
-      return done(null, profile);
-    }
-  )
-);
+// passport.use(
+//   new GithubStrategy(
+//     {
+//       clientID: process.env.GITHUB_CLIENT_ID,
+//       clientSecret: process.env.GITHUB_CLIENT_SECRET,
+//       callbackURL: "http://localhost:3000/auth/github",
+//     },
+//     (accessToken, refreshToken, profile, done) => {
+//       console.log(profile);
+//       return done(null, profile);
+//     }
+//   )
+// );
 
 passport.serializeUser((user, done) => {
   done(null, user._id);

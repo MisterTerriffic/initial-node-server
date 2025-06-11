@@ -48,7 +48,7 @@ router.get("/logout", logout);
 
 router.get(
   "/login/google",
-  passport.authenticate.apply("google", { sscope: ["profile", "email"] })
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 router.get("/google/callback", passport.authenticate("google", {}));
